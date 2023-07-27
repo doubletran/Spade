@@ -1,0 +1,513 @@
+#pragma once
+/*Card.h
+variable: number and suit for each card*/
+/// Class Card contains number and suits of each card in the deck
+
+//from 2 to to are integers withou names
+const int jack = 11;
+const int queen = 12;
+const int king = 13;
+const int ace = 14;
+
+//enum type for four decks
+
+enum Suit { hearts, diamonds, clubs, spades };
+struct Card {
+	
+	int number;
+	Suit suit;
+	Card();
+	Card(int _number, Suit _suit);
+	void display();
+	//if other card is equal with this card
+	bool isEqual(Card other);
+};
+
+//Card.cpp
+#include <iostream>
+using namespace std;
+#include "Card.h"
+Card::Card():number(0), suit() {};
+Card::Card(int _number, Suit _suit) : number(_number), suit(_suit) {};
+void Card::display() {
+	if (number >= 2 && number <= 10) cout << number;
+	else
+		switch (number) {
+		case jack: cout << "J"; break;
+		case queen: cout << "Q"; break;
+		case king: cout << "K"; break;
+		case ace: cout << "A"; break;
+		}
+	switch (suit) {
+		case hearts: cout << static_cast<char>(3); break;
+		case diamonds: cout << static_cast<char> (4); break;
+		case clubs: cout << static_cast<char>(5); break;
+		case spades: cout << static_cast<char>(6); break;
+		}
+		cout << ' ';
+}
+	//if other card is equal with this card
+bool Card:: isEqual(Card other) {
+	if ((number == other.number) && (suit = other.suit)) return true;
+	else return false;
+}
+
+#Deck.h
+#pragma once
+#include<string.h>
+#include<vector>
+#include <cstdlib>
+#include<time.h>
+#include "Card.h"
+using namespace std;
+//initial setup and distribute card
+const int SIZE = 52;
+const int HAND = 4;
+const int HAND_S = 13;
+
+struct Deck {
+	Card deck[SIZE];
+
+	vector<vector<Card>> hands;
+	Deck();
+	//create an order deck
+	void order();
+	//distribute card by four hand
+	void setHand();
+};
+
+#include "Deck.h"
+
+Deck::Deck() {
+	order();
+	setHand();
+}
+//Function order() to initiate an ordered card
+void Deck::order() {
+	int pos = 0;
+	for (int i = 0; i < 4; i++) {
+		for (int n = 14; n >= 2; n--) {
+			Card temp(n, static_cast<Suit>(i));
+			deck[pos] = temp;
+			++pos;
+		}
+	}
+}
+void Deck::setHand() {
+	//seed time randmly
+	srand(time(NULL));
+	//initialize 2d vector hand 
+	for (int i = 0; i < HAND; i++) {
+		vector<Card>h;
+		hands.push_back(h);
+	}
+
+	//tracking list to keep track of full vectors
+	vector<int>list = { 0,1,2,3 };
+	for (int i = 0; i < SIZE; i++) {
+		int h = rand() % list.size();
+		int pos = list[h];
+
+		//add card to each hand governed randomly
+		hands[pos].push_back(deck[i]);
+
+		// if hand's size reach 13, erase vector's index from the list
+		if (hands[pos].size() == 13) {
+			list.erase(list.begin() + h);
+		}
+	}
+}
+
+#Player.h
+#pragma once
+#include "Card.h"
+#include "Deck.h"
+
+struct Player {
+	int myNo;
+	int finalScore;
+
+	Player(vector<Card>_hand);
+//EACH PLAYER HAS:
+	//vector of hand containing value of their hand
+	vector<Card>hand;
+
+	vector<vector<int>>sorted;
+	vector<int>avail = { 0,1,2,3 };
+	void update();
+
+
+	//function to order card to input value for each vectors
+	void orderbySuit(vector<Card> unsorted);
+	
+	//bid value
+	int bid;
+	int bidSafe;
+	int bidRisk;
+	//mode = safe or risk
+	int bidding(int mode);
+
+	bool spadeBreak;
+
+	//start function incase 
+
+	void goFirst();
+
+	Card curCard;
+	void display();
+	void setCurrentCard(int pos, Suit _suit);
+	void playCard(Suit _curSuit, Card winCard);
+	
+	void chooseCard(Card winCard);
+	int roundWon;
+	void calculateScore();
+};
+
+#include "Player.h"
+#include<iostream>
+const int safeR = 3;
+const int riskR = 4;
+using namespace std;
+#include <time.h>
+#include <stdio.h>      /* printf, NULL */
+#include <stdlib.h>
+
+
+//prototype
+int bidOnSuit(vector<int>value, int mode);
+
+
+//constructor
+Player::Player(vector<Card> unSorted){
+
+	roundWon = 0;
+
+	orderbySuit(unSorted);
+	update();
+	
+
+	bidSafe = bidding(safeR);
+	bidRisk = bidding(riskR);
+	bid = (bidSafe + bidRisk) / 2;
+
+	spadeBreak = false;
+}//constructor
+
+//update vector of availability of current cards for each suit
+void Player::update() {
+	for (int i = 0; i < avail.size(); i++) {
+		if (sorted[avail[i]].size() == 0) {
+			avail.erase(avail.begin() + i);
+		}
+	}
+}
+//put in order by suit
+//put the value of card in the array of their suit
+void Player::orderbySuit(vector<Card>unsorted) {
+	//initialize 2d vector hand 
+	for (int i = 0; i < HAND; i++) {
+		vector<int>h;
+		sorted.push_back(h);
+	}
+	for (int i = 0; i < unsorted.size(); i++) {
+		int suitValue = unsorted[i].suit;
+		sorted[suitValue].push_back(unsorted[i].number);
+	}
+}
+/*setCurrentCard
+* set the current card following the parameters
+* delete the current card from the player hand
+*/
+
+void Player::setCurrentCard(int pos, Suit _suit) {
+	curCard = { sorted[_suit][pos], _suit };
+	sorted[_suit].erase(sorted[_suit].begin() +pos);
+	update();
+}
+
+
+//display bid
+void Player::display() {
+	for (int i = 0; i < HAND; i++) {
+		for (int j = 0; j < sorted[i].size(); j++) {
+			Card card(sorted[i][j], static_cast<Suit>(i));
+			card.display();
+		}
+	}
+
+	cout << "Bid: "<<bid << endl;
+}
+
+//bidding function return variable bit value 
+int Player:: bidding(int mode) {
+	/*bid on spade
+	If the number of spade card exceed the difference of other suit card, each extra spade card is counted as a bid*/
+	int _bid = 0;
+	for (int i = 0; i < 3; i++) {
+		_bid += (sorted[3].size() - _bid) > (mode - sorted[i].size()) ? mode - sorted[i].size() : _bid;
+	}
+	for (int i = 0; i < 4; i++) {
+		_bid += bidOnSuit(sorted[i], mode);
+	}
+	return _bid;
+}
+//funtion to return bids depending on each suit's power
+int bidOnSuit(vector<int>value, int mode) {
+	int MAX = 14;
+	int _bid = mode - value.size();
+	for (const int& i : value) {
+		while (i == MAX) { _bid++;	MAX--; }
+	}
+	return _bid;
+}
+
+void Player:: goFirst() {
+	//random mode
+	int _suit = 3;
+	//random all suits except spade
+	if (!spadeBreak) {
+		while (_suit == 3) {
+			_suit = avail[rand() % avail.size()];
+		}
+	}
+	else {
+		_suit = avail[rand()%avail.size()];
+	}
+	int pos = rand() % sorted[_suit].size();
+	setCurrentCard(pos, static_cast<Suit>(_suit));
+}
+void Player::playCard(Suit _curSuit, Card winCard) {
+	if (sorted[_curSuit].size() > 0) {
+		if (winCard.suit == _curSuit) {
+			chooseCard(winCard);
+		}
+		else {
+			Card temp(0, _curSuit);
+			chooseCard(temp);
+		}
+	}
+	//if there is no more card in that suit
+	else{
+		//BREAK SPADE
+		if (sorted[spades].size() > 0) {
+			//create Card object with the smallest number
+			Card temp(0, spades);
+			chooseCard(temp);
+		}
+		else {
+			int randSuit = avail[rand() % avail.size()];
+			Card temp(0, static_cast<Suit>(randSuit));
+			chooseCard(temp);
+		}
+	}
+}
+void Player::chooseCard(Card winCard) {
+	Suit _suit = winCard.suit;
+	for (int i = 0; i < sorted[_suit].size(); i++) {
+		if (sorted[_suit][i] > winCard.number) {
+			setCurrentCard(i, _suit);
+			break;
+		}
+		else {
+			setCurrentCard(sorted[_suit].size() - 1, _suit);
+			break;
+		}
+	}
+}
+void Player::calculateScore() {
+	//if bid is met
+	if (roundWon >= bid) {
+		finalScore+= bid * 10 + (roundWon - bid);
+	}
+	else {
+		finalScore -= bid * 10;
+	}
+}
+
+#Round.h
+
+#pragma once
+#include "Player.h"
+
+
+using namespace std;
+struct Round {
+	Card curCard;
+	Card winCard;
+	Suit suit;
+	Suit winSuit;
+	Round();
+
+	Round( Player &starter);
+	
+	//vector list contain card on order of playing for that round
+	vector<Card>curRound;
+
+	//add function 
+	//take Player obj as an argument
+	void add(Player &player);
+
+	void findWinner(int playerNo, Card curCard, Card winCard);
+	bool spadeBreakRound;
+	int winner;
+	
+};
+
+#include "Round.h"
+#include <iostream>
+
+using namespace std;
+void display(int playerNo, Card currentCard);
+Round::Round( Player &starter) {
+	starter.goFirst();
+	curCard = starter.curCard;
+	curRound.push_back(curCard);
+	suit = curCard.suit;
+	winSuit = suit;
+	spadeBreakRound = false;
+	winner = starter.myNo;
+	//initialize winner with the first card
+	winCard = curCard;
+	display(starter.myNo, curCard);
+}
+void display(int playerNo, Card currentCard) {
+	cout << "Player " << playerNo << " ";
+	currentCard.display();
+	cout << endl;
+}
+
+void Round::add(Player &player) {
+	int playerNo = player.myNo;
+	player.playCard(suit, winCard);
+	curCard = player.curCard;
+	display(playerNo, curCard);
+	//update spade break round
+	if (!spadeBreakRound) {
+		if ((suit != spades) && (curCard.suit == spades)) {
+			//win immediately
+			winCard = curCard;
+			winner = playerNo;
+			spadeBreakRound = true;
+		}
+		else{
+			findWinner(playerNo,curCard, winCard);
+		}
+	}
+	else{
+		findWinner(playerNo,curCard, winCard);
+	}
+	curRound.push_back(curCard);
+}
+ void Round::findWinner(int playerNo, Card curCard, Card winCard) {
+	 if ((curCard.suit == winCard.suit) && (curCard.number > winCard.number)) {
+		 winner = playerNo;
+		 this->winCard = curCard;
+	 }
+}
+
+
+/*
+
+	Suit suit;
+	int winner;
+	int tracker;
+	Round(Player starter) {
+		starter.goFirst();
+		card[playerNo] = first;
+		suit = first.suit;
+		int winner = playerNo;
+		tracker++;
+	}
+
+	void add(Card player, int playerNo) {
+		tracker++;
+		// if player follow the suit  or if player's suit is spade while winner's suit is also spades, the player can only win if her number is larger than the winner's
+		if ((player.suit == suit) || ((player.suit == spades) && (card[winner].suit == spades))) {
+			if (player.number > card[winner].number) { int winner = playerNo; }
+		}
+		else if (player.suit == spades) { int winner = playerNo; } // if the player break the spade, he wins
+		//finally, add player's card to the round based on their number
+		card[playerNo] = player;
+	}
+};
+
+*/
+#include <iostream>
+#include<string.h>
+#include<vector>
+#include <cstdlib>
+#include<time.h>
+#include "Deck.h"
+#include "Player.h"
+#include "Round.h"
+
+
+
+using namespace std;
+
+
+
+
+int main() {
+	//call deck object to set up a full deck
+	Deck deck;
+
+	//call four hand object to set up four hands
+	Player players[4] = { deck.hands[0], deck.hands[1], deck.hands[2], deck.hands[3] };
+	//update player number
+	for (int i = 0; i < HAND; i++) {
+		players[i].myNo = i;
+	}
+	//display bid and card
+
+	bool spadeBreak = false;
+
+	//first player to start the game
+	srand(time(0));
+	int posPlayer = 0;
+	
+	//THE GAME BEGINS........
+	//each Round object will contain the current round including four cards 
+	//played by each players
+
+	//loop over 13 rounds
+	for (int r = 0; r < HAND_S; r++) {
+		cout << "\nRound: " << r+1 << endl;
+		//display the player's hand at the start of each game
+		for (int i = 0; i < HAND; i++) {
+			cout << "PLAYER " << i << endl;
+			players[i].display();
+			cout << endl;
+		}
+
+		Round newRound(players[posPlayer++]);
+		while (newRound.curRound.size() <HAND) {
+			if (posPlayer == HAND) {
+				posPlayer = 0;
+			}
+			newRound.add(players[posPlayer++]);
+		}
+
+		//end of round: update the player starting next round
+		posPlayer = newRound.winner;
+		cout << "Winner is player " << posPlayer;
+		for (int i = 0; i < HAND; i++) {
+			//if playerNo == final winner, wonRound increase by 1
+			if (players[i].myNo == newRound.winner) { players[i].roundWon++; break; }
+		}
+		
+	}
+
+	
+	
+
+
+}
+
+		
+
+
+
+
+
+

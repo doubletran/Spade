@@ -1,0 +1,8 @@
+SAFE MODE
+-go to the highest card on that suit if have any
+RISK MODE
+-go to the lowest card on that suit if have any
+if LOSE: 
+-go to the lowest card on that suit to lose
+
+-go to the highest card lower
