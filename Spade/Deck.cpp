@@ -28,7 +28,7 @@ void Deck::setHand() {
 
 	//tracking list to keep track of full vectors
 	vector<int>list = { 0,1,2,3 };
-	for (int i = 0; i < SIZE; i++) {
+	for (int i = 0; i < DECK_SIZE; i++) {
 		int h = rand() % list.size();
 		int pos = list[h];
 

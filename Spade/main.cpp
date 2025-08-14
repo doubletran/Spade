@@ -1,19 +1,16 @@
 
-#include <iostream>
-#include <string.h>
-#include <vector>
-#include <cstdlib>
-#include <time.h>
-#include "Deck.h"
-#include "Player.h"
-#include "Round.h"
-#include <iomanip>
+#include "main.h"
 
 using namespace std;
 
 
 
-int main() {
+int main(int argc, char* argv[]) {
+	glutInit(&argc, argv);
+
+	InitGraphics();
+	glutSetWindow(MainWindow);
+	glutMainLoop();
 	//call deck object to set up a full deck
 	Deck deck;
 	Player players[4] = { 0,1,2,3 };
@@ -93,6 +90,7 @@ int main() {
 	for (int i = 0; i < HAND; i++) {
 		players[i].displayScore();
 	}
-	
+	return 0;
 }
+
 

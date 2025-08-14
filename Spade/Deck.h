@@ -8,12 +8,12 @@
 using namespace std;
 
 //initial setup and distribute card
-const int SIZE = 52;
+const int DECK_SIZE = 52;
 const int HAND = 4;
 const int HAND_S = 13;
 
 struct Deck {
-	Card deck[SIZE];
+	Card deck[DECK_SIZE];
 
 	vector<vector<Card>> hands;
 	Deck();
