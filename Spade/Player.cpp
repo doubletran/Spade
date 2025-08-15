@@ -27,8 +27,6 @@ void Player::newGame(vector<Card> hand) {
 	bags = 0;
 	orderbySuit(hand);
 	update();
-
-
 	bidSafe = bidding(safeR);
 	bidRisk = bidding(riskR);
 	bid = (bidSafe + bidRisk) / 2;

@@ -24,3 +24,71 @@ void Card::display() {
 	}
 	cout << ' ';
 }
+void Card::InitTexture() {
+	string suitName;
+	switch (suit) {
+	case hearts:
+		suitName = "heart";
+		break;
+	case diamonds:
+		suitName = "diamond";
+		break;
+	case clubs:
+		suitName = "club";
+		break;
+	case spades:
+		suitName = "spade";
+		break;
+	}
+	string cardTexName = "../Spade/asset/Cards/card_" + suitName + "_" + to_string(number) + ".png";
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(cardTexName.c_str(), &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	
+	}
+	else {
+		cout << "Failed to load texture "  +  cardTexName << endl;
+	}
+	stbi_image_free(data);
+}
+
+void Card::InitList() {
+	InitTexture();
+
+	const double CARD_HEIGHT = 2.f;
+	const double CARD_WIDTH = 1.5f;
+	dlist = glGenLists(1);
+	glNewList(dlist, GL_COMPILE);
+	glEnable(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBegin(GL_QUADS);
+	// Top-left
+
+// Bottom-left corner
+	glTexCoord2d(0.0, 0.0); // Texture coordinate
+	glVertex3f(0.0f, 0.0f, 0.0f); // Vertex position
+
+	// Bottom-right corner
+	glTexCoord2d(1.0, 0.0); // Texture coordinate
+	glVertex3f(CARD_WIDTH, 0.f, 0.0f); // Vertex position
+
+	// Top-right corner
+	glTexCoord2d(1.0, 1.0); // Texture coordinate
+	glVertex3f(CARD_WIDTH, CARD_HEIGHT, 0.0f); // Vertex position
+
+	// Top-left corner
+	glTexCoord2d(0.0, 1.0); // Texture coordinate
+	glVertex3f(0.f, CARD_HEIGHT, 0.0f); // Vertex position
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glEndList();
+}

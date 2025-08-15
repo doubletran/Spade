@@ -1,9 +1,9 @@
 
 #pragma once
-#include<string.h>
-#include<vector>
+#include <string.h>
+#include <vector>
 #include <cstdlib>
-#include<time.h>
+#include <time.h>
 #include "Card.h"
 using namespace std;
 

@@ -9,6 +9,9 @@ int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
 
 	InitGraphics();
+	InitTextures();
+	InitLists();
+
 	glutSetWindow(MainWindow);
 	glutMainLoop();
 	//call deck object to set up a full deck

@@ -12,6 +12,7 @@ void Deck::order() {
 		for (int n = 14; n >= 2; n--) {
 			Card temp(n, static_cast<Suit>(i));
 			deck[pos] = temp;
+			deck[pos].InitList();
 			++pos;
 		}
 	}
@@ -33,7 +34,7 @@ void Deck::setHand() {
 		int pos = list[h];
 
 		//add card to each hand governed randomly
-		hands[pos].push_back(deck[i]);
+		hands[pos].emplace_back(deck[i]);
 
 		// if hand's size reach 13, erase vector's index from the list
 		if (hands[pos].size() == 13) {

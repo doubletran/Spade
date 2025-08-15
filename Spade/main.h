@@ -18,6 +18,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <glut.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 const char* WINDOWTITLE = "OpenGL / GLUT Sample -- Joe Graphics";
 const char* GLUITITLE = "SPADE";
@@ -32,6 +34,8 @@ int		MainWindow;
 int		Xmouse, Ymouse;			// mouse values
 float	Time;
 int		ActiveButton;
+GLuint CardTex;
+GLuint CardDL;
 
 // initialize the glut and OpenGL libraries:
 //	also setup callback functions
@@ -43,17 +47,67 @@ void	MouseMotion(int, int);
 void	Reset();
 void	Resize(int, int);
 void	Visibility(int);
+void	InitTextures();
+void InitLists() {
+	const double CARD_HEIGHT = 2.f;
+	const double CARD_WIDTH = 1.5f;
+	CardDL = glGenLists(1);
+	glNewList(CardDL, GL_COMPILE);
+	glEnable(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, CardTex);
+	glBegin(GL_QUADS);
+	// Top-left
+
+// Bottom-left corner
+	glTexCoord2d(0.0, 0.0); // Texture coordinate
+	glVertex3f(0.0f,0.0f, 0.0f); // Vertex position
+
+	// Bottom-right corner
+	glTexCoord2d(1.0, 0.0); // Texture coordinate
+	glVertex3f(CARD_WIDTH, 0.f, 0.0f); // Vertex position
+
+	// Top-right corner
+	glTexCoord2d(1.0, 1.0); // Texture coordinate
+	glVertex3f(CARD_WIDTH, CARD_HEIGHT, 0.0f); // Vertex position
+
+	// Top-left corner
+	glTexCoord2d(0.0, 1.0); // Texture coordinate
+	glVertex3f(0.f, CARD_HEIGHT, 0.0f); // Vertex position
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glEndList();
+
+}
+void InitTextures() {
+	glGenTextures(1, &CardTex);
+	glBindTexture(GL_TEXTURE_2D, CardTex);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("../Spade/asset/Cards/card_clubs_1.png", &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		
+	}
+	else {
+		cout << "Failed to load texture" << endl;
+	}
+	stbi_image_free(data);
+
+
+}
 void
 Display()
 {
 
-
 	// set which window we want to do the graphics into:
 	glutSetWindow(MainWindow);
 
-	// erase the background:
-	glDrawBuffer(GL_BACK);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -66,60 +120,10 @@ Display()
 	GLint yb = (vy - v) / 2;
 	glViewport(xl, yb, v, v);
 
-
-	// set the viewing volume:
-	// remember that the Z clipping  values are given as DISTANCES IN FRONT OF THE EYE
-	// USE gluOrtho2D( ) IF YOU ARE DOING 2D !
-/*
-		
-		glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	GluOrth
-	gluOrtho2D(-2.f, 2.f, -2.f, 2.f, 0.1f, 1000.f);
-	//SetPointLight(GL_LIGHT0, LightPos[0], LightPos[1], LightPos[2], WHITE[0], WHITE[1], WHITE[2]);
-	// place the objects into the scene:
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	//glEnable(GL_LIGHTING);
-	//glEnable(GL_LIGHT0);
-
-
-	// draw some gratuitous text that just rotates on top of the scene:
-	// i commented out the actual text-drawing calls -- put them back in if you have a use for them
-	// a good use for thefirst one might be to have your name on the screen
-	// a good use for the second one might be to have vertex numbers on the screen alongside each vertex
-	glColor3f(0.f, 1.f, 1.f);
-	//DoRasterString( 0.f, 1.f, 0.f, (char *)"Text That Moves" );
-
-
-	// draw some gratuitous text that is fixed on the screen:
-	//
-	// the projection matrix is reset to define a scene whose
-	// world coordinate system goes from 0-100 in each axis
-	//
-	// this is called "percent units", and is just a convenience
-	//
-	// the modelview matrix is reset to identity as we don't
-	// want to transform these coordinates
-	*/
-	glDisable(GL_DEPTH_TEST);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0.f, 100.f, 0.f, 100.f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glColor3f(1.f, 1.f, 1.f);
-	//DoRasterString( 5.f, 5.f, 0.f, (char *)"Text That Doesn't" );
-
-	// swap the double-buffered framebuffers:
-
-	glutSwapBuffers();
-
-	// be sure the graphics buffer has been sent:
-	// note: be sure to use glFlush( ) here, not glFinish( ) !
-
+	glEnable(GL_TEXTURE_2D);
+	glCallList(CardDL);
 	glFlush();
+
 }
 
 
@@ -222,6 +226,10 @@ InitGraphics()
 #endif
 
 	// all other setups go here, such as GLSLProgram and KeyTime setups:
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0.0, 10.0, 0.0, 10.0);
+	glMatrixMode(GL_MODELVIEW);
 
 }
 
