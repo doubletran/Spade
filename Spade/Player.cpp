@@ -22,10 +22,10 @@ Player::Player(int playerNo) {
 	type = static_cast<Type>(rand() % 3);
 
 }//constructor
-void Player::newGame(vector<Card> hand) {
+void Player::newGame(vector<Card> _hand) {
 	roundWon = 0;
 	bags = 0;
-	orderbySuit(hand);
+	orderbySuit(_hand);
 	update();
 	bidSafe = bidding(safeR);
 	bidRisk = bidding(riskR);
@@ -34,6 +34,7 @@ void Player::newGame(vector<Card> hand) {
 //put in order by suit
 //put the value of card in the array of their suit
 void Player::orderbySuit(vector<Card>unsorted) {
+	hand = unsorted;
 	//initialize 2d vector hand 
 	for (int i = 0; i < HAND; i++) {
 		vector<int>h;
@@ -75,8 +76,6 @@ void Player::update() {
 		}
 	}
 	allow = avail;
-
-
 }
 
 /*setCurrentCard
@@ -95,14 +94,23 @@ void Player::setCurrentCard(int pos, Suit _suit) {
 
 //display bid
 void Player::display() {
+	/*
 	for (int i = 0; i < HAND; i++) {
 		for (int j = 0; j < sorted[i].size(); j++) {
 			Card card(sorted[i][j], static_cast<Suit>(i));
-			card.display();
+			card.DisplayList();
 		}
 	}
-
-	cout << "Bid: " << bid << endl;
+	*/
+	int pos = 0;
+	for ( auto &aCard : hand) {
+		glTranslatef(pos, 0, 0);
+		aCard.DisplayList();
+		glTranslatef(-pos, 0, 0);
+		pos++;
+	}
+	
+	//cout << "Bid: " << bid << endl;
 }
 void Player::goFirst(bool _spadeBreak) {
 	if ((!_spadeBreak) && (allow[allow.size() - 1] == 3)) {

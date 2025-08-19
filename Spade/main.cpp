@@ -9,27 +9,19 @@ int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
 
 	InitGraphics();
-	InitTextures();
-	InitLists();
-
-	glutSetWindow(MainWindow);
-	glutMainLoop();
-	//call deck object to set up a full deck
-	Deck deck;
-	Player players[4] = { 0,1,2,3 };
-	
-
+	//InitTextures();
+	//InitLists();
 	//call four hand object to set up four hands
 	for (int i = 0; i < HAND; i++) {
 		players[i].newGame(deck.hands[i]);
 	}
-	for (int i = 0; i < HAND; i++) {
-		cout << "PLAYER " << i << endl;
-		players[i].display();
-		cout << endl;
-	}
+
+	glutSetWindow(MainWindow);
+	glutMainLoop();
 
 	
+
+	/*
 	//first player to start the game
 	srand(time(0));
 	int num = 0;
@@ -93,6 +85,7 @@ int main(int argc, char* argv[]) {
 	for (int i = 0; i < HAND; i++) {
 		players[i].displayScore();
 	}
+	*/
 	return 0;
 }
 

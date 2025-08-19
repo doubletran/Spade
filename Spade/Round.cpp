@@ -5,44 +5,42 @@ using namespace std;
 void display(int playerNo, Card currentCard);
 Round::Round(Card firstCard, int playerNo) {
 	spadeBreakRound = false;
-	winCard = firstCard;
-	suit = winCard.suit;
-	curRound.push_back(winCard);
-	winner = playerNo;
+	inCards.push_back(firstCard);
+	setWin(playerNo, firstCard);
 	display(playerNo, winCard);
 }
 
 void display(int playerNo, Card currentCard) {
-	
 	currentCard.display();
 	cout << endl;
 }
 
-void Round::add(Card card_, int playerNo) {
-	curCard = card_;
+void Round::add(Card curCard, int playerNo) {
 	display(playerNo, curCard);
-	//update spade break round
+	//if spade hasn't been broken, check if there'd be spadebreak
 	if (!spadeBreakRound) {
-		if ((suit != spades) && (curCard.suit == spades)) {
+		if ((this->winCard.suit != spades) && (curCard.suit == spades)) {
 			//win immediately
-			winCard = curCard;
-			winner = playerNo;
+			setWin(playerNo, curCard);
 			spadeBreakRound = true;
 		}
 		else {
-			findWinner(playerNo, curCard, winCard);
+			if (checkLarger(curCard)) {
+				setWin(playerNo, curCard);
+			}
 		}
 	}
 	else {
-		findWinner(playerNo, curCard, winCard);
+		setWin(playerNo, curCard);
 	}
-	curRound.push_back(curCard);
-}
-void Round::findWinner(int playerNo, Card curCard, Card winCard) {
-	if ((curCard.suit == winCard.suit) && (curCard.number > winCard.number)) {
-		winner = playerNo;
-		this->winCard = curCard;
-	}
+	inCards.push_back(curCard);
 }
 
+void Round::setWin(int playerNo, Card card) {
+	this->winner = playerNo;
+	this->winCard = card;
+}
+bool Round::checkLarger(Card currCard) {
+	return ((currCard.suit == this->winCard.suit) && (currCard.number > this->winCard.number));
+}
 

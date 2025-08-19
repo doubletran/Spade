@@ -6,7 +6,8 @@ using namespace std;
 
 Card::Card() :number(0), suit() {};
 Card::Card(int _number, Suit _suit) : number(_number), suit(_suit) {};
-
+const double CARD_HEIGHT = 2.f;
+const double CARD_WIDTH = 1.5f;
 void Card::display() {
 	if (number >= 2 && number <= 10) cout << number;
 	else
@@ -34,13 +35,17 @@ void Card::InitTexture() {
 		suitName = "diamond";
 		break;
 	case clubs:
-		suitName = "club";
+		suitName = "clubs";
 		break;
 	case spades:
 		suitName = "spade";
 		break;
 	}
-	string cardTexName = "../Spade/asset/Cards/card_" + suitName + "_" + to_string(number) + ".png";
+	string number_string = to_string(number);
+	if (number == ACE) {
+		number_string = "1";
+	}
+	string cardTexName = "../Spade/asset/Cards/card_" + suitName + "_" + number_string + ".png";
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -52,7 +57,6 @@ void Card::InitTexture() {
 	unsigned char* data = stbi_load(cardTexName.c_str(), &width, &height, &nrChannels, 0);
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	
 	}
 	else {
 		cout << "Failed to load texture "  +  cardTexName << endl;
@@ -60,13 +64,41 @@ void Card::InitTexture() {
 	stbi_image_free(data);
 }
 
-void Card::InitList() {
+void Card::InitList(const int pos) {
 	InitTexture();
 
-	const double CARD_HEIGHT = 2.f;
-	const double CARD_WIDTH = 1.5f;
-	dlist = glGenLists(1);
+
+	list_pos = pos;
+	dlist = pos;
 	glNewList(dlist, GL_COMPILE);
+	glEnable(GL_TEXTURE_2D);
+	
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBegin(GL_QUADS);
+	// Top-left
+
+// Bottom-left corner
+	glTexCoord2d(0.0, 0.0); // Texture coordinate
+	glVertex3f(0.0f, 0.0f, 0.0f); // Vertex position
+
+	// Bottom-right corner
+	glTexCoord2d(1.0, 0.0); // Texture coordinate
+	glVertex3f(CARD_WIDTH, 0.f, 0.0f); // Vertex position
+
+	// Top-right corner
+	glTexCoord2d(1.0, 1.0); // Texture coordinate
+	glVertex3f(CARD_WIDTH, CARD_HEIGHT, 0.0f); // Vertex position
+
+	// Top-left corner
+	glTexCoord2d(0.0, 1.0); // Texture coordinate
+	glVertex3f(0.f, CARD_HEIGHT, 0.0f); // Vertex position
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glEndList();
+}
+void Card::DisplayList() {
+	InitTexture();
+
 	glEnable(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -90,5 +122,5 @@ void Card::InitList() {
 	glVertex3f(0.f, CARD_HEIGHT, 0.0f); // Vertex position
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
-	glEndList();
+
 }

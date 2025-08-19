@@ -23,11 +23,13 @@ struct Card {
 	Suit suit;
 	GLuint dlist;
 	GLuint texture;
+	GLuint list_pos;
 
 
 	Card();
 	Card(int _number, Suit _suit);
 	void display();
-	void InitList();
+	void InitList(const int pos);
 	void InitTexture();
+	void DisplayList();
 };

@@ -36,6 +36,9 @@ float	Time;
 int		ActiveButton;
 GLuint CardTex;
 GLuint CardDL;
+//call deck object to set up a full deck
+Deck deck;
+Player players[4] = { 0,1,2,3 };
 
 // initialize the glut and OpenGL libraries:
 //	also setup callback functions
@@ -121,7 +124,13 @@ Display()
 	glViewport(xl, yb, v, v);
 
 	glEnable(GL_TEXTURE_2D);
-	glCallList(CardDL);
+	//glCallList(CardDL);
+	for (int i = 0; i < HAND; i++) {
+		//cout << "PLAYER " << i << endl;
+		players[i].display();
+		//cout << endl;
+	}
+
 	glFlush();
 
 }
