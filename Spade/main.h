@@ -26,9 +26,9 @@ const char* GLUITITLE = "SPADE";
 const int INIT_WINDOW_SIZE = 600;
 // active mouse buttons (or them together):
 
-const int LEFT = 4;
-const int MIDDLE = 2;
-const int RIGHT = 1;
+const int LEFT_MOUSE = 4;
+const int MIDDLE_MOUSE = 2;
+const int RIGHT_MOUSE = 1;
 const GLfloat BACKCOLOR[] = { 0., 0., 0., 1. };
 int		MainWindow;
 int		Xmouse, Ymouse;			// mouse values
@@ -42,6 +42,7 @@ Player players[4] = { 0,1,2,3 };
 
 // initialize the glut and OpenGL libraries:
 //	also setup callback functions
+void	Display();
 void	InitLists();
 void	InitMenus();
 void	Keyboard(unsigned char, int, int);
@@ -103,37 +104,7 @@ void InitTextures() {
 
 
 }
-void
-Display()
-{
 
-	// set which window we want to do the graphics into:
-	glutSetWindow(MainWindow);
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glDisable(GL_DEPTH_TEST);
-
-	// set the viewport to be a square centered in the window:
-
-	GLsizei vx = glutGet(GLUT_WINDOW_WIDTH);
-	GLsizei vy = glutGet(GLUT_WINDOW_HEIGHT);
-	GLsizei v = vx < vy ? vx : vy;			// minimum dimension
-	GLint xl = (vx - v) / 2;
-	GLint yb = (vy - v) / 2;
-	glViewport(xl, yb, v, v);
-
-	glEnable(GL_TEXTURE_2D);
-	//glCallList(CardDL);
-	for (int i = 0; i < HAND; i++) {
-		//cout << "PLAYER " << i << endl;
-		players[i].display();
-		//cout << endl;
-	}
-
-	glFlush();
-
-}
 
 
 void
@@ -257,13 +228,13 @@ MouseButton(int button, int state, int x, int y)
 	switch (button)
 	{
 	case GLUT_LEFT_BUTTON:
-		b = LEFT;		break;
+		b = LEFT_MOUSE;		break;
 
 	case GLUT_MIDDLE_BUTTON:
-		b = MIDDLE;		break;
+		b = MIDDLE_MOUSE;		break;
 
 	case GLUT_RIGHT_BUTTON:
-		b = RIGHT;		break;
+		b = RIGHT_MOUSE;		break;
 
 
 	default:

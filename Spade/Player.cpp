@@ -20,8 +20,8 @@ Player::Player(int playerNo) {
 	botMode = true;
 	teamNo = myNo > 1 ? myNo - 2 : myNo + 2;
 	type = static_cast<Type>(rand() % 3);
-
 }//constructor
+
 void Player::newGame(vector<Card> _hand) {
 	roundWon = 0;
 	bags = 0;
@@ -68,6 +68,7 @@ int bidOnSuit(vector<int>value, int mode) {
 	}
 	return _bid;
 }
+
 //update vector of availability of current cards for each suit
 void Player::update() {
 	for (int i = 0; i < avail.size(); i++) {
@@ -82,7 +83,6 @@ void Player::update() {
 * set the current card following the parameters
 * delete the current card from the player hand
 */
-
 void Player::setCurrentCard(int pos, Suit _suit) {
 	curCard = { sorted[_suit][pos], _suit };
 	sorted[_suit].erase(sorted[_suit].begin() + pos);
@@ -102,11 +102,12 @@ void Player::display() {
 		}
 	}
 	*/
-	int pos = 0;
+	double pos = 0;
+
 	for ( auto &aCard : hand) {
-		glTranslatef(pos, 0, 0);
+		glTranslatef(pos*0.5f, 0, 0);
 		aCard.DisplayList();
-		glTranslatef(-pos, 0, 0);
+		glTranslatef(-pos*0.5f, 0, 0);
 		pos++;
 	}
 	
@@ -119,7 +120,7 @@ void Player::goFirst(bool _spadeBreak) {
 
 	if (botMode) {
 		Card temp(0, static_cast<Suit>(allow[rand() % allow.size()]));
-		chooseCard(temp);
+		chooseLargerCard(temp);
 	}
 	else {
 		askUserInput();
@@ -165,17 +166,17 @@ void Player::playCard(Round &round) {
 	Card winCard = round.winCard;
 	if (botMode) {
 		if (winCard.suit == _curSuit) {
-			chooseCard(winCard);
+			chooseLargerCard(winCard);
 		}
 		else {
 			if (sorted[spades].size()>0) {
 				//create Card object with the smallest number
 				Card temp(0, spades);
-				chooseCard(temp);
+				chooseLargerCard(temp);
 			}
 			else {
 				Card temp(0, _curSuit);
-				chooseCard(temp);
+				chooseLargerCard(temp);
 			}
 		}
 	}
@@ -183,7 +184,7 @@ void Player::playCard(Round &round) {
 		askUserInput();
 	}
 }
-void Player::chooseCard(Card winCard) {
+void Player::chooseLargerCard(Card winCard) {
 	Suit _suit = winCard.suit;
 	for (int i = 0; i < sorted[_suit].size(); i++) {
 		if (sorted[_suit][i] > winCard.number) {

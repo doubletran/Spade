@@ -18,18 +18,23 @@ const int ACE = 14;
 //enum type for four decks
 enum Suit { hearts, diamonds, clubs, spades };
 
-struct Card {
+class Card {
+public:
 	int number;
 	Suit suit;
 	GLuint dlist;
 	GLuint texture;
 	GLuint list_pos;
+	static GLuint texture3d;
 
 
 	Card();
 	Card(int _number, Suit _suit);
+	static void InitTexture3d();
+	
 	void display();
 	void InitList(const int pos);
 	void InitTexture();
 	void DisplayList();
+	
 };

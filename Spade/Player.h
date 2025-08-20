@@ -5,7 +5,8 @@
 #include "Round.h"
 struct Round;
 enum Type { risky, moderate, safe };
-struct Player {
+class Player {
+
 	int myNo;
 	int finalScore;
 	int bags;
@@ -13,7 +14,6 @@ struct Player {
 
 	Type type;
 
-	Player(int playerNo);
 	//EACH PLAYER HAS:
 		//vector of hand containing value of their hand
 	vector<Card>hand;
@@ -22,8 +22,11 @@ struct Player {
 	vector<int>avail = { 0,1,2,3 };
 	vector<int>allow;
 	vector<Card>handRanked;
-	void update();
+public:
 
+	Player(int playerNo);
+	void newGame(vector<Card> newHand);
+	void update();
 	void setAllow(bool _spadeBreak);
 	//function to order card to input value for each vectors
 	void orderbySuit(vector<Card> unsorted);
@@ -37,22 +40,18 @@ struct Player {
 	void goFirst(bool _spadeBreak);
 	void askUserInput();
 	//start function incase 
-
-
 	void display();
 	void setCurrentCard(int pos, Suit _suit);
 	void playCard(Round &round);
 
-	void chooseCard(Card winCard);
+	void chooseLargerCard(Card winCard);
 	int roundWon;
 	bool botMode;
 	void calculateScore();
-	void newGame(vector<Card> newHand);
+
 	void displayScore();
 	int getSuit(bool _spadeBreak);
+	vector<int> getValidSuits();
 
 	void rank();
-
-
-
 };

@@ -2,25 +2,99 @@
 #include "main.h"
 
 using namespace std;
+int userNo = rand() % HAND;
+//LEFT, TOP, RIGHT, BOTTOM position
+enum Position {LEFT, TOP, RIGHT, BOTTOM};
+int topPlayerNo, leftPlayerNo, rightPlayerNo, bottomPlayerNo;
+void
+Display()
+{
 
+	// set which window we want to do the graphics into:
+	glutSetWindow(MainWindow);
 
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glDisable(GL_DEPTH_TEST);
+
+	// set the viewport to be a square centered in the window:
+
+	GLsizei vx = glutGet(GLUT_WINDOW_WIDTH);
+	GLsizei vy = glutGet(GLUT_WINDOW_HEIGHT);
+	GLsizei v = vx < vy ? vx : vy;			// minimum dimension
+	GLint xl = (vx - v) / 2;
+	GLint yb = (vy - v) / 2;
+	glViewport(xl, yb, v, v);
+
+	glEnable(GL_TEXTURE_2D);
+	//glCallList(CardDL);
+	//LEFT
+	for (int i = 0; i < HAND; i++) {
+		glTranslatef(1.f, 0.f, 0.f);
+		glRotatef(90, 0, 0, 1);
+		players[i].display();
+		glRotatef(-90, 0, 0, 1);
+		glTranslatef(-1.f, 0.f, 0.f);
+	}
+	glPushMatrix();
+	glTranslatef(0, 9, 0);
+	//cout << "PLAYER " << i << endl;
+	players[topPlayerNo].display();
+	//glTranslatef(0, -9, 0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1.f, 0.f, 0.f);
+	glRotatef(90, 0, 0, 1);
+	players[leftPlayerNo].display();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(10.f, 0.f, 0.f);
+	glRotatef(90, 0, 0, 1);
+	players[rightPlayerNo].display();
+	glPopMatrix();
+
+	players[bottomPlayerNo].display();
+	glFlush();
+
+}
 
 int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
 
 	InitGraphics();
+	Card::InitTexture3d();
+	Position firstPlayerPos = static_cast<Position>(rand() % HAND);
+	for (int i = 0; i < HAND; i++) {
+		Position pos = static_cast<Position>(i + firstPlayerPos);
+		switch (pos) {
+		case TOP:
+			topPlayerNo = i;
+			break;
+		case LEFT:
+			leftPlayerNo = i;
+			break;
+		case RIGHT:
+			rightPlayerNo = i;
+			break;
+		case BOTTOM:
+			bottomPlayerNo = i;
+			break;
+		}
+	}
 	//InitTextures();
 	//InitLists();
 	//call four hand object to set up four hands
+
+	players[userNo].botMode = false;
+
 	for (int i = 0; i < HAND; i++) {
 		players[i].newGame(deck.hands[i]);
 	}
 
 	glutSetWindow(MainWindow);
 	glutMainLoop();
-
-	
-
 	/*
 	//first player to start the game
 	srand(time(0));

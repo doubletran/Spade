@@ -8,6 +8,7 @@ using namespace std;
 struct Round {
 	Card winCard;
 	Suit winSuit;
+	Suit suit;
 	bool spadeBreakRound;
 	int winner;
 	//vector list contain card on order of playing for that round
