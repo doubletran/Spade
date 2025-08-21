@@ -10,6 +10,7 @@ set(SOURCES
     ${SRC}/Game.cpp
     ${SRC}/Player.cpp
     ${SRC}/Round.cpp
+    ${SRC}/glslprogram.cpp
 
 
     # Uncomment these if you want them in your IDE, you generally

@@ -7,13 +7,11 @@ Deck::Deck() {
 }
 //Function order() to initiate an ordered card
 void Deck::order() {
-	int genlist = glGenLists(52);
 	int pos = 0;
 	for (int i = 0; i < 4; i++) {
 		for (int n = 14; n >= 2; n--) {
 			Card temp(n, static_cast<Suit>(i));
 			deck[pos] = temp;
-			deck[pos].InitList(pos);
 			++pos;
 		}
 	}

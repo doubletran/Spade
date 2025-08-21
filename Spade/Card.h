@@ -25,6 +25,7 @@ public:
 	GLuint dlist;
 	GLuint texture;
 	GLuint list_pos;
+	bool faceUp = true;
 	static GLuint texture3d;
 
 
@@ -33,8 +34,7 @@ public:
 	static void InitTexture3d();
 	
 	void display();
-	void InitList(const int pos);
-	void InitTexture();
+
 	void DisplayList();
 	
 };
